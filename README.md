@@ -1,6 +1,6 @@
 # CS460-Whiteboard-App
-" 	The application to be developed has two parts: a server, that represents a distributed "white board" and a client application, that sends commands to the server.
-The server interprets and executes the commands, which results in simple lines being drawn on the white board.
+" 	The application to be developed has two parts: a server, that represents a distributed "white board" and a client application, that sends commands to the server. \n
+The server interprets and executes the commands, which results in simple lines being drawn on the white board. /n
 At any time there may be several clients talking to the server and thus drawing on the white board.
 The white board behaves like a turtle graphics application.
 	- This means that there is a single pen, which may be lifted (and thus does not draw) or put down (when it is supposed to draw).
