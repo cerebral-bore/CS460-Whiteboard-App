@@ -17,6 +17,12 @@ import java.awt.event.*;
 import javax.swing.*;
 
 public class displayPanel extends JPanel{
+	Graphics g;
+	int direction = 0;
+	int initial = 0;
+	int increment = 20;
+	int currentX = 200;
+	int currentY = 200;
 	
 	public displayPanel(){
 		this.setBackground(Color.WHITE);
@@ -24,19 +30,57 @@ public class displayPanel extends JPanel{
 	}
 	
 	public void paintComponent(Graphics g){
+		// Perhaps create an array that stores drawn objects to be repainted
+		// Over and over again, very inefficient???
 		super.paintComponent(g);
 		Graphics2D g2 = (Graphics2D) g;
-		g2.setStroke(new BasicStroke(3));
-		
+		g2.setStroke(new BasicStroke(5));
 		g2.setColor(Color.RED);
-		g2.drawRect(10,10,200,0);
-		g2.setColor(Color.BLUE);
-		g2.drawRect(20,20,200,0);
-		g2.setColor(Color.GREEN);
-		g2.drawRect(30,30,200,0);
-		g2.setColor(Color.MAGENTA);
-		g2.drawRect(40,40,200,0);
 		
+		if(initial != 0){
+			if(direction == 0){
+				// Do nothing with make the current draw disappear
+				if((initial == 1) || (initial == 2)){
+					g2.drawRect(currentX, currentY, 0, 10);
+				} else {
+					g2.drawRect(currentX, currentY, 10, 0);
+				}
+		} else if(direction == 1){
+				System.out.println("Going North.");
+				currentY -= 20;
+				g2.drawRect(currentX, currentY, 0, 10);
+				// increment += 5;
+				
+			} else if(direction == 2){
+				System.out.println("Going South.");
+				currentY += 20;
+				g2.drawRect(currentX, currentY, 0, 10);
+				// increment += 5;
+				
+			} else if(direction == 3){
+				System.out.println("Going East.");
+				currentX += 20;
+				g2.drawRect(currentX, currentY, 10, 0);
+				// increment += 5;
+				
+			} else if(direction == 4){
+				System.out.println("Going West.");
+				currentX -= 20;
+				g2.drawRect(currentX, currentY, 10, 0);
+				// increment += 5;
+				
+			}
+		} else {
+			g2.drawRect(currentX, currentY, 10, 0);
+		}
+		// Call the draw array here if so
+	}
+	
+	public void draw_a_Line(int x, int y, int inDirection){
+		if(inDirection != 0){
+			initial = inDirection;
+		}
+		direction = inDirection;
 	}
 	
 }

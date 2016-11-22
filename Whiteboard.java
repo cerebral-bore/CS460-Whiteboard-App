@@ -31,7 +31,12 @@ public class Whiteboard implements ActionListener{
     BufferedReader input;
     PrintWriter output;
 	public static String[] cmdInput;
+	int currentX = 200;
+	int currentY = 200;
+	int penLifted = 0;
 	
+	JPanel totalGUI = new JPanel();
+	displayPanel drawDisplay = new displayPanel();
 	JPanel titlePanel, timePanel, buttonPanel;
 	JLabel dateLabel, northOutput, southOutput, eastOutput, westOutput, liftOutput, lowerOutput;
 	JButton northButton, southButton, eastButton, westButton, liftButton, lowerButton, resetButton;
@@ -52,7 +57,6 @@ public class Whiteboard implements ActionListener{
 	
 	public JPanel createContentPane(){
 		// Create a bottom JPanel to contain everything
-		JPanel totalGUI = new JPanel();
 		totalGUI.setLayout(null);
 		
 			// Create a panel to have titles
@@ -80,7 +84,6 @@ public class Whiteboard implements ActionListener{
 		totalGUI.add(buttonPanel);
 		
 		// Create a panel to have titles
-		displayPanel drawDisplay = new displayPanel();
 		drawDisplay.setLayout(null);
 		drawDisplay.setLocation(10,150);
 		drawDisplay.setSize(480,400);
@@ -144,29 +147,34 @@ public class Whiteboard implements ActionListener{
 				System.out.println("Error: Couldn't connect to server");
 				System.exit(1);
 			}
-		}
+		}*/
 		
 		if(e.getSource() == northButton){
-			northOutput.setText(""+(calendar.get(Calendar.YEAR)));
+			drawDisplay.draw_a_Line(currentX, currentY, 1);
+
 		} else if(e.getSource() == southButton){
-			southOutput.setText(""+(calendar.get(Calendar.MONTH)+1));
+			drawDisplay.draw_a_Line(currentX, currentY, 2);
+
 		} else if(e.getSource() == eastButton){
-			eastOutput.setText(""+(calendar.get(Calendar.DAY_OF_MONTH)));
+			drawDisplay.draw_a_Line(currentX, currentY, 3);
+
 		} else if(e.getSource() == westButton){
-			westOutput.setText(""+(calendar.get(Calendar.HOUR)));
+			drawDisplay.draw_a_Line(currentX, currentY, 4);
+
 		} else if(e.getSource() == liftButton){
-			liftOutput.setText(""+(calendar.get(Calendar.MINUTE)));
+			// Update a value to not draw things
+			drawDisplay.draw_a_Line(currentX, currentY, 0);
+			penLifted = 1;
 		} else if(e.getSource() == lowerButton){
-			lowerOutput.setText(""+(calendar.get(Calendar.SECOND)));
+			// Update a value to start drawing things again
+			drawDisplay.draw_a_Line(currentX, currentY, 0);
+			penLifted = 0;
 		} else if(e.getSource() == resetButton){
-			northOutput.setText("North");
-			southOutput.setText("South");
-			eastOutput.setText("East");
-			westOutput.setText("West");
-			liftOutput.setText("Lifted Pen");
-			lowerOutput.setText("Lowered Pen");
+			// Consider removing, if kept then clear screen
+			drawDisplay.draw_a_Line(currentX, currentY, 0);
 		}
-		*/
+		drawDisplay.repaint();
+		totalGUI.repaint();
 	}
 	
 	private static void createWindow(){
