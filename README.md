@@ -1,4 +1,11 @@
 # CS460-Whiteboard-App
+
+Current Status:
+	+ Buttons do SOMETHING now
+	- Only draws a single sized line at a time
+	- Previous lines are currently being deleted
+	- Net protocol not yet implemented
+
 " 	The application to be developed has two parts: a server, that represents a distributed "white board" and a client application, that sends commands to the server.
 
 The server interprets and executes the commands, which results in simple lines being drawn on the white board.
