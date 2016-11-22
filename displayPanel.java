@@ -20,9 +20,9 @@ public class displayPanel extends JPanel{
 	Graphics g;
 	int direction = 0;
 	int initial = 0;
-	int increment = 20;
-	int currentX = 200;
-	int currentY = 200;
+	int length;
+	int currentX = 225;
+	int currentY = 225;
 	
 	public displayPanel(){
 		this.setBackground(Color.WHITE);
@@ -41,46 +41,78 @@ public class displayPanel extends JPanel{
 			if(direction == 0){
 				// Do nothing with make the current draw disappear
 				if((initial == 1) || (initial == 2)){
-					g2.drawRect(currentX, currentY, 0, 10);
+					g2.drawRect(currentX, currentY, 0, length);
 				} else {
-					g2.drawRect(currentX, currentY, 10, 0);
+					g2.drawRect(currentX, currentY, length, 0);
 				}
 		} else if(direction == 1){
 				System.out.println("Going North.");
-				currentY -= 20;
-				g2.drawRect(currentX, currentY, 0, 10);
+				currentY -= length;
+				clamp(currentY);
+				g2.drawRect(currentX, currentY, 0, length);
 				// increment += 5;
 				
 			} else if(direction == 2){
 				System.out.println("Going South.");
-				currentY += 20;
-				g2.drawRect(currentX, currentY, 0, 10);
+				currentY += length;
+				clamp(currentY);
+				g2.drawRect(currentX, currentY, 0, length);
 				// increment += 5;
 				
 			} else if(direction == 3){
 				System.out.println("Going East.");
-				currentX += 20;
-				g2.drawRect(currentX, currentY, 10, 0);
+				currentX += length;
+				clamp(currentX);
+				g2.drawRect(currentX, currentY, length, 0);
 				// increment += 5;
 				
 			} else if(direction == 4){
 				System.out.println("Going West.");
-				currentX -= 20;
-				g2.drawRect(currentX, currentY, 10, 0);
+				currentX -= length;
+				clamp(currentX);
+				g2.drawRect(currentX, currentY, length, 0);
 				// increment += 5;
 				
 			}
 		} else {
-			g2.drawRect(currentX, currentY, 10, 0);
+			g2.drawRect(currentX, currentY, 1, 1);
 		}
 		// Call the draw array here if so
 	}
 	
-	public void draw_a_Line(int x, int y, int inDirection){
+	public void draw_a_Line(int length, int inDirection){
+		if(inDirection != 0){
+			initial = inDirection;
+		}
+		this.length = length;
+		direction = inDirection;
+	}
+	
+	public void draw_a_Line(int inDirection){
 		if(inDirection != 0){
 			initial = inDirection;
 		}
 		direction = inDirection;
+	}
+	
+	public void clamp(int input){
+		if(input < 0){
+			if(currentX == input){
+				System.out.println("Clamping X value, it was < 0.");
+				currentX = 0;
+			} else if(currentY == input){
+				System.out.println("Clamping Y value, it was < 0.");
+				currentY = 0;
+			}
+		} else if(input >= (475-length)){
+			if(currentX == input){
+				currentX = (475-length);
+				System.out.println("Clamping X value, it was > the window size.");
+			} else if(currentY == input){
+				currentY = (475-length);
+				System.out.println("Clamping Y value, it was > the window size.");
+			}
+		}
 	}
 	
 }

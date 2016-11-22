@@ -37,9 +37,10 @@ public class Whiteboard implements ActionListener{
 	
 	JPanel totalGUI = new JPanel();
 	displayPanel drawDisplay = new displayPanel();
-	JPanel titlePanel, timePanel, buttonPanel;
+	JPanel titlePanel, textPanel, timePanel, buttonPanel;
 	JLabel dateLabel, northOutput, southOutput, eastOutput, westOutput, liftOutput, lowerOutput;
 	JButton northButton, southButton, eastButton, westButton, liftButton, lowerButton, resetButton;
+	JTextField textField = new JTextField(3);
 	/*
 	public void connect() throws IOException{
 		try {
@@ -63,18 +64,32 @@ public class Whiteboard implements ActionListener{
 		titlePanel = new JPanel();
 		titlePanel.setLayout(null);
 		titlePanel.setLocation(10,0);
-		titlePanel.setSize(480,30);
+		titlePanel.setSize(360,30);
 		// Must be added to the totalGUI JPanel
 		totalGUI.add(titlePanel);
+		
+		// Create a panel to have the input field
+		textPanel = new JPanel();
+		textPanel.setLayout(null);
+		textPanel.setLocation(370,0);
+		textPanel.setSize(110,30);
+		// Must be added to the totalGUI JPanel
+		totalGUI.add(textPanel);
 		
 		// Create a label to label the output of blue score
 		dateLabel = new JLabel("Local Time: " + date.toString());
 		dateLabel.setLocation(0,0);
-		dateLabel.setSize(480,30);
+		dateLabel.setSize(360,30);
 		dateLabel.setHorizontalAlignment(0);
 		dateLabel.setForeground(Color.blue);
 		// Must be added to the titles JPanel
 		titlePanel.add(dateLabel);
+		
+		// Add the textfield to the textPanel
+		textField.setLocation(0,0);
+		textField.setSize(100,30);
+		textField.setHorizontalAlignment(0);
+		textPanel.add(textField);
 		
 			// Panel for the Buttons
 		buttonPanel = new JPanel();
@@ -86,7 +101,7 @@ public class Whiteboard implements ActionListener{
 		// Create a panel to have titles
 		drawDisplay.setLayout(null);
 		drawDisplay.setLocation(10,150);
-		drawDisplay.setSize(480,400);
+		drawDisplay.setSize(480,480);
 		// Must be added to the totalGUI JPanel
 		totalGUI.add(drawDisplay);
 		
@@ -148,33 +163,59 @@ public class Whiteboard implements ActionListener{
 				System.exit(1);
 			}
 		}*/
+		int length = 0;
+		String text = textField.getText();
+		int flag = 0;
 		
-		if(e.getSource() == northButton){
-			drawDisplay.draw_a_Line(currentX, currentY, 1);
-
-		} else if(e.getSource() == southButton){
-			drawDisplay.draw_a_Line(currentX, currentY, 2);
-
-		} else if(e.getSource() == eastButton){
-			drawDisplay.draw_a_Line(currentX, currentY, 3);
-
-		} else if(e.getSource() == westButton){
-			drawDisplay.draw_a_Line(currentX, currentY, 4);
-
-		} else if(e.getSource() == liftButton){
+		if(e.getSource() == liftButton){
 			// Update a value to not draw things
-			drawDisplay.draw_a_Line(currentX, currentY, 0);
+			drawDisplay.draw_a_Line(0);
 			penLifted = 1;
+			flag = 0;
 		} else if(e.getSource() == lowerButton){
 			// Update a value to start drawing things again
-			drawDisplay.draw_a_Line(currentX, currentY, 0);
+			drawDisplay.draw_a_Line(0);
 			penLifted = 0;
+			flag = 0;
 		} else if(e.getSource() == resetButton){
 			// Consider removing, if kept then clear screen
-			drawDisplay.draw_a_Line(currentX, currentY, 0);
+			drawDisplay.draw_a_Line(0);
+			flag = 0;
 		}
-		drawDisplay.repaint();
-		totalGUI.repaint();
+		
+		if(textField.getText() != ""){
+			try{
+				length = Integer.parseInt(text);
+			}catch(NumberFormatException exception){
+				System.err.println("Empty text field... Setting length to '0.'");
+				length = 0;
+			}
+		} else {
+			length = 0;
+		}
+		if(length >= 51){
+			System.out.println("Max line size is 50.");
+			length = 50;
+		}
+		
+		if(e.getSource() == northButton){
+			drawDisplay.draw_a_Line(length, 1);
+			flag = 1;
+		} else if(e.getSource() == southButton){
+			drawDisplay.draw_a_Line(length, 2);
+			flag = 1;
+		} else if(e.getSource() == eastButton){
+			drawDisplay.draw_a_Line(length, 3);
+			flag = 1;
+		} else if(e.getSource() == westButton){
+			drawDisplay.draw_a_Line(length, 4);
+			flag = 1;
+		}
+		if(flag != 0){
+			System.out.print("Drawing line of size: " + length + ", ");
+			drawDisplay.repaint();
+			totalGUI.repaint();
+		}
 	}
 	
 	private static void createWindow(){
@@ -187,7 +228,7 @@ public class Whiteboard implements ActionListener{
 		frame.setContentPane(demo.createContentPane());
 		
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.setSize(520,600);
+		frame.setSize(520,680);
 		frame.setVisible(true);
 		// Refresh time
 		while(true){
