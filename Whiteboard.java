@@ -34,6 +34,7 @@ public class Whiteboard implements ActionListener{
 	int currentX = 200;
 	int currentY = 200;
 	int penLifted = 0;
+	int flag = 1;
 	
 	JPanel totalGUI = new JPanel();
 	displayPanel drawDisplay = new displayPanel();
@@ -165,7 +166,6 @@ public class Whiteboard implements ActionListener{
 		}*/
 		int length = 0;
 		String text = textField.getText();
-		int flag = 0;
 		
 		if(e.getSource() == liftButton){
 			// Update a value to not draw things
@@ -176,11 +176,10 @@ public class Whiteboard implements ActionListener{
 			// Update a value to start drawing things again
 			drawDisplay.draw_a_Line(0);
 			penLifted = 0;
-			flag = 0;
+			flag = 1;
 		} else if(e.getSource() == resetButton){
 			// Consider removing, if kept then clear screen
 			drawDisplay.draw_a_Line(0);
-			flag = 0;
 		}
 		
 		if(textField.getText() != ""){
@@ -199,17 +198,13 @@ public class Whiteboard implements ActionListener{
 		}
 		
 		if(e.getSource() == northButton){
-			drawDisplay.draw_a_Line(length, 1);
-			flag = 1;
+			drawDisplay.draw_a_Line(flag, length, 1);
 		} else if(e.getSource() == southButton){
-			drawDisplay.draw_a_Line(length, 2);
-			flag = 1;
+			drawDisplay.draw_a_Line(flag, length, 2);
 		} else if(e.getSource() == eastButton){
-			drawDisplay.draw_a_Line(length, 3);
-			flag = 1;
+			drawDisplay.draw_a_Line(flag, length, 3);
 		} else if(e.getSource() == westButton){
-			drawDisplay.draw_a_Line(length, 4);
-			flag = 1;
+			drawDisplay.draw_a_Line(flag, length, 4);
 		}
 		if(flag != 0){
 			System.out.print("Drawing line of size: " + length + ", ");

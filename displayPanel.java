@@ -12,21 +12,33 @@
 			- Field to input the length of the distance to be moved upon hitting one of N/S/E/W "
 */
 
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Shape;
+import java.awt.BasicStroke;
+import java.util.*;
 import java.awt.event.*;
 import javax.swing.*;
+import java.awt.geom.Line2D;
 
 public class displayPanel extends JPanel{
 	Graphics g;
+	Graphics2D g2 = (Graphics2D) g;
 	int direction = 0;
 	int initial = 0;
 	int length;
 	int currentX = 225;
 	int currentY = 225;
+	int iteration = -1;
+	int[] array = new int[4];
+	int[] tempArray = new int[4];
+	List<Shape> draws = new ArrayList<>();
 	
 	public displayPanel(){
 		this.setBackground(Color.WHITE);
 		this.setBorder(BorderFactory.createStrokeBorder(new BasicStroke(1.0f)));
+		System.out.println("Test");
 	}
 	
 	public void paintComponent(Graphics g){
@@ -41,43 +53,66 @@ public class displayPanel extends JPanel{
 			if(direction == 0){
 				// Do nothing with make the current draw disappear
 				if((initial == 1) || (initial == 2)){
-					g2.drawRect(currentX, currentY, 0, length);
+					updateQueue(currentX, currentY, 0, length);
 				} else {
-					g2.drawRect(currentX, currentY, length, 0);
+					updateQueue(currentX, currentY, length, 0);
 				}
 		} else if(direction == 1){
 				System.out.println("Going North.");
 				currentY -= length;
 				clamp(currentY);
-				g2.drawRect(currentX, currentY, 0, length);
+				updateQueue(currentX, currentY, 0, length);
 				// increment += 5;
 				
 			} else if(direction == 2){
 				System.out.println("Going South.");
 				currentY += length;
 				clamp(currentY);
-				g2.drawRect(currentX, currentY, 0, length);
+				updateQueue(currentX, currentY, 0, length);
 				// increment += 5;
 				
 			} else if(direction == 3){
 				System.out.println("Going East.");
 				currentX += length;
 				clamp(currentX);
-				g2.drawRect(currentX, currentY, length, 0);
+				updateQueue(currentX, currentY, length, 0);
 				// increment += 5;
 				
 			} else if(direction == 4){
 				System.out.println("Going West.");
 				currentX -= length;
 				clamp(currentX);
-				g2.drawRect(currentX, currentY, length, 0);
+				updateQueue(currentX, currentY, length, 0);
 				// increment += 5;
 				
 			}
 		} else {
-			g2.drawRect(currentX, currentY, 1, 1);
+			updateQueue(currentX, currentY, 1, 1);
 		}
 		// Call the draw array here if so
+		drawAll(g2);
+	}
+	
+	public void draw_a_Line(int flag, int length, int inDirection){
+		if(flag == 0){
+			switch(inDirection){
+				case 1: currentY -= length;
+						break;
+				case 2: currentY += length;
+						break;
+				case 3: currentX += length;
+						break;
+				case 4: currentX -= length;
+						break;
+				
+			}
+		} else {
+			if(inDirection != 0){
+				initial = inDirection;
+			}
+			this.length = length;
+			direction = inDirection;
+		}
 	}
 	
 	public void draw_a_Line(int length, int inDirection){
@@ -115,4 +150,13 @@ public class displayPanel extends JPanel{
 		}
 	}
 	
+	public void updateQueue(int a, int b, int c, int d){
+		draws.add(new Line2D.Double(a,b,a+c,b+d));
+	}
+	
+	public void drawAll(Graphics2D g2){
+		for(Shape shape : draws){
+			g2.draw(shape);
+		}
+	}
 }
