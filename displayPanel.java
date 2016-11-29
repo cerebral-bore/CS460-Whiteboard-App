@@ -53,7 +53,7 @@ public class displayPanel extends JPanel{
 		Graphics2D g2 = (Graphics2D) g;
 		
 		// Set a draw width and color
-		g2.setStroke(new BasicStroke(5));
+		g2.setStroke(new BasicStroke(5.0f));
 		g2.setColor(Color.RED);
 		
 		// here we begin the painting
@@ -81,14 +81,14 @@ public class displayPanel extends JPanel{
 				System.out.println("Going South.");
 				currentY += length;
 				clamp(currentY);
-				updateQueue(currentX, currentY, 0, length);
+				updateQueue(currentX, currentY, 0, (length *= -1));
 				
 			} else if(direction == 3){
 				// Here is where we go when the East button is pressed.
 				System.out.println("Going East.");
 				currentX += length;
 				clamp(currentX);
-				updateQueue(currentX, currentY, length, 0);
+				updateQueue(currentX, currentY, (length *= -1), 0);
 				
 			} else if(direction == 4){
 				// Here is where we go when the West button is pressed.
@@ -101,7 +101,9 @@ public class displayPanel extends JPanel{
 		} else {
 			updateQueue(currentX, currentY, 1, 1);
 		}
-		drawAll(g2);
+		for(Shape shape : draws){
+			g2.draw(shape);
+		}
 	}
 	
 	// draw_a_Line is a function that has multiple possible arguments.
@@ -109,6 +111,7 @@ public class displayPanel extends JPanel{
 	public void draw_a_Line(int flag, int length, int inDirection){
 		// Here is where we go when ANY button is pressed.
 		if(flag == 0){
+			// Here we just move the pen
 			switch(inDirection){
 				case 1: currentY -= length; // Go up (North)
 						break;
@@ -118,7 +121,6 @@ public class displayPanel extends JPanel{
 						break;
 				case 4: currentX -= length; // Go left (West)
 						break;
-				
 			}
 		} else {
 			// Set the initial values if the button pressed is the first one
@@ -177,12 +179,5 @@ public class displayPanel extends JPanel{
 	// to EITHER the addX value or addY value, this is determined in paintComponent 'else if' direction cases
 	public void updateQueue(int x, int y, int addX, int addY){
 		draws.add(new Line2D.Double(x,y,x+addX,y+addY));
-	}
-	
-	// Call draw for the all items inside of the 'draws' queue
-	public void drawAll(Graphics2D g2){
-		for(Shape shape : draws){
-			g2.draw(shape);
-		}
 	}
 }

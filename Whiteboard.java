@@ -33,8 +33,8 @@ public class Whiteboard implements ActionListener{
 	public static String[] cmdInput;
 	int currentX = 200;
 	int currentY = 200;
-	int penLifted = 0;
 	int flag = 1;
+	int direction = 0;
 	
 	JPanel totalGUI = new JPanel();
 	displayPanel drawDisplay = new displayPanel();
@@ -150,6 +150,7 @@ public class Whiteboard implements ActionListener{
         lowerButton.addActionListener(this);
         buttonPanel.add(lowerButton);
 
+		// Consider removing..
         resetButton = new JButton("Clear board");
         resetButton.setLocation(0, 70);
         resetButton.setSize(480, 30);
@@ -165,7 +166,7 @@ public class Whiteboard implements ActionListener{
 		e.getSource() will check what button it was that called the function
 		'length' and 'text' are used for essentially the same thing, that being translating how far the user wants to draw
 		Under each if stated is where certain events will occur.
-		If flag == 0, the program will not draw anything <consider removing penLifted>
+		If flag == 0, the program will not draw anything
 			This is 1 otherwise and is only changed by either the Lower pen button and Lift pen buttons
 		Otherwise, the program will draw the desired size line in the direction of the button pressed
 	*/
@@ -184,18 +185,17 @@ public class Whiteboard implements ActionListener{
 		
 		if(e.getSource() == liftButton){
 			// Update a value to not draw things
-			drawDisplay.draw_a_Line(0);
-			penLifted = 1;
 			flag = 0;
+			direction = 0;
 		} else if(e.getSource() == lowerButton){
 			// Update a value to start drawing things again
-			drawDisplay.draw_a_Line(0);
-			penLifted = 0;
 			flag = 1;
 		} else if(e.getSource() == resetButton){
 			// Consider removing, if kept then clear screen
 			// Ignore this button for now, don't really think we need a reset button
-			drawDisplay.draw_a_Line(0);
+			flag = 0;
+			direction = 0;
+			System.out.println("Clear board button Currently functions as a Lift Pen button");
 		}
 		
 		if(textField.getText() != ""){
@@ -221,21 +221,44 @@ public class Whiteboard implements ActionListener{
 			Think of displaypanel.java as a helper class for the GUI
 		*/
 		if(e.getSource() == northButton){
-			
-			drawDisplay.draw_a_Line(flag, length, 1);
+			direction = 1;
+			drawDisplay.draw_a_Line(flag, length, direction);
 		} else if(e.getSource() == southButton){
-			drawDisplay.draw_a_Line(flag, length, 2);
+			direction = 2;
+			drawDisplay.draw_a_Line(flag, length, direction);
 		} else if(e.getSource() == eastButton){
-			drawDisplay.draw_a_Line(flag, length, 3);
+			direction = 3;
+			drawDisplay.draw_a_Line(flag, length, direction);
 		} else if(e.getSource() == westButton){
-			drawDisplay.draw_a_Line(flag, length, 4);
+			direction = 4;
+			drawDisplay.draw_a_Line(flag, length, direction);
 		}
+		
 		if(flag == 1){
-			System.out.print("Drawing line of size: " + length + ", ");
-			// Repaint is required as without it, the display will not update OR will only paint the most recent
-			// button press, if i recall correctly from when I was testing, the latter will occur.
-			drawDisplay.repaint();
-			totalGUI.repaint();
+			if(e.getSource() == lowerButton){
+				// Do nothing
+			} else {
+				System.out.print("Drawing line of size: " + length + ", ");
+				// Repaint is required as without it, the display will not update OR will only paint the most recent
+				// button press, if i recall correctly from when I was testing, the latter will occur.
+				drawDisplay.repaint();
+				totalGUI.repaint();
+			}
+		} else {
+			switch(direction){
+				case 1:
+					System.out.println("Moving line " + length + " steps North-ward");
+					break;
+				case 2:
+					System.out.println("Moving line " + length + " steps South-ward");
+					break;
+				case 3:
+					System.out.println("Moving line " + length + " steps East-ward");
+					break;
+				case 4:
+					System.out.println("Moving line " + length + " steps West-ward");
+					break;
+			}
 		}
 	}
 	
