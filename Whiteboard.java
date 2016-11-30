@@ -31,10 +31,17 @@ public class Whiteboard implements ActionListener{
     BufferedReader input;
     PrintWriter output;
 	public static String[] cmdInput;
+	int currentX = 200;
+	int currentY = 200;
+	int flag = 1;
+	int direction = 0;
 	
-	JPanel titlePanel, timePanel, buttonPanel;
+	JPanel totalGUI = new JPanel();
+	displayPanel drawDisplay = new displayPanel();
+	JPanel titlePanel, textPanel, timePanel, buttonPanel;
 	JLabel dateLabel, northOutput, southOutput, eastOutput, westOutput, liftOutput, lowerOutput;
 	JButton northButton, southButton, eastButton, westButton, liftButton, lowerButton, resetButton;
+	JTextField textField = new JTextField(3);
 	/*
 	public void connect() throws IOException{
 		try {
@@ -50,27 +57,44 @@ public class Whiteboard implements ActionListener{
 	}
 	*/
 	
+	// This is where the buttons and draw areas will be drawn
+	
 	public JPanel createContentPane(){
 		// Create a bottom JPanel to contain everything
-		JPanel totalGUI = new JPanel();
 		totalGUI.setLayout(null);
 		
 			// Create a panel to have titles
 		titlePanel = new JPanel();
 		titlePanel.setLayout(null);
 		titlePanel.setLocation(10,0);
-		titlePanel.setSize(480,30);
+		titlePanel.setSize(360,30);
 		// Must be added to the totalGUI JPanel
 		totalGUI.add(titlePanel);
 		
+		// Create a panel to have the input field
+		// THIS WILL CREATE AN INPUT FIELD
+		textPanel = new JPanel();
+		textPanel.setLayout(null);
+		textPanel.setLocation(370,0);
+		textPanel.setSize(110,30);
+		// Must be added to the totalGUI JPanel
+		totalGUI.add(textPanel);
+		
 		// Create a label to label the output of blue score
+		// This is just a basic 'output text' field
 		dateLabel = new JLabel("Local Time: " + date.toString());
 		dateLabel.setLocation(0,0);
-		dateLabel.setSize(480,30);
+		dateLabel.setSize(360,30);
 		dateLabel.setHorizontalAlignment(0);
 		dateLabel.setForeground(Color.blue);
 		// Must be added to the titles JPanel
 		titlePanel.add(dateLabel);
+		
+		// Add the textfield to the textPanel
+		textField.setLocation(0,0);
+		textField.setSize(100,30);
+		textField.setHorizontalAlignment(0);
+		textPanel.add(textField);
 		
 			// Panel for the Buttons
 		buttonPanel = new JPanel();
@@ -80,20 +104,22 @@ public class Whiteboard implements ActionListener{
 		totalGUI.add(buttonPanel);
 		
 		// Create a panel to have titles
-		displayPanel drawDisplay = new displayPanel();
 		drawDisplay.setLayout(null);
 		drawDisplay.setLocation(10,150);
-		drawDisplay.setSize(480,400);
+		drawDisplay.setSize(480,480);
 		// Must be added to the totalGUI JPanel
 		totalGUI.add(drawDisplay);
 		
 		// Create buttons with given actionListeners
+		// HERE WE DRAW THE BUTTONS
+		// Each one is given a location and a size within the button panel
 		northButton = new JButton("Go North");
         northButton.setLocation(0, 0);
         northButton.setSize(120, 30);
         northButton.addActionListener(this);
         buttonPanel.add(northButton);
-
+	
+		// Another few buttons GO TO "actionPerformed" function to see what these buttons do
         southButton = new JButton("Go South");
         southButton.setLocation(120, 0);
         southButton.setSize(120, 30);
@@ -124,6 +150,7 @@ public class Whiteboard implements ActionListener{
         lowerButton.addActionListener(this);
         buttonPanel.add(lowerButton);
 
+		// Consider removing..
         resetButton = new JButton("Clear board");
         resetButton.setLocation(0, 70);
         resetButton.setSize(480, 30);
@@ -135,6 +162,14 @@ public class Whiteboard implements ActionListener{
 	}
 	
 	// Create the actionPerformed method that catches ActionListeners
+	/* HERE IS WHERE THE BUTTON MAGIC HAPPENS
+		e.getSource() will check what button it was that called the function
+		'length' and 'text' are used for essentially the same thing, that being translating how far the user wants to draw
+		Under each if stated is where certain events will occur.
+		If flag == 0, the program will not draw anything
+			This is 1 otherwise and is only changed by either the Lower pen button and Lift pen buttons
+		Otherwise, the program will draw the desired size line in the direction of the button pressed
+	*/
 	public void actionPerformed(ActionEvent e){
 		calendar = Calendar.getInstance();/*
 		if(e.getSource() != resetButton){
@@ -144,31 +179,90 @@ public class Whiteboard implements ActionListener{
 				System.out.println("Error: Couldn't connect to server");
 				System.exit(1);
 			}
+		}*/
+		int length = 0;
+		String text = textField.getText();
+		
+		if(e.getSource() == liftButton){
+			// Update a value to not draw things
+			flag = 0;
+			direction = 0;
+		} else if(e.getSource() == lowerButton){
+			// Update a value to start drawing things again
+			flag = 1;
+		} else if(e.getSource() == resetButton){
+			// Consider removing, if kept then clear screen
+			// Ignore this button for now, don't really think we need a reset button
+			flag = 0;
+			direction = 0;
+			System.out.println("Clear board button Currently functions as a Lift Pen button");
 		}
 		
-		if(e.getSource() == northButton){
-			northOutput.setText(""+(calendar.get(Calendar.YEAR)));
-		} else if(e.getSource() == southButton){
-			southOutput.setText(""+(calendar.get(Calendar.MONTH)+1));
-		} else if(e.getSource() == eastButton){
-			eastOutput.setText(""+(calendar.get(Calendar.DAY_OF_MONTH)));
-		} else if(e.getSource() == westButton){
-			westOutput.setText(""+(calendar.get(Calendar.HOUR)));
-		} else if(e.getSource() == liftButton){
-			liftOutput.setText(""+(calendar.get(Calendar.MINUTE)));
-		} else if(e.getSource() == lowerButton){
-			lowerOutput.setText(""+(calendar.get(Calendar.SECOND)));
-		} else if(e.getSource() == resetButton){
-			northOutput.setText("North");
-			southOutput.setText("South");
-			eastOutput.setText("East");
-			westOutput.setText("West");
-			liftOutput.setText("Lifted Pen");
-			lowerOutput.setText("Lowered Pen");
+		if(textField.getText() != ""){
+			// Here we parse the input text from the text field and convert it to an Int
+			try{
+				length = Integer.parseInt(text);
+			}catch(NumberFormatException exception){
+				System.err.println("Empty text field... Setting length to '0.'");
+				length = 0;
+			}
+		} else {
+			length = 0;
 		}
+		if(length >= 51){
+			// Here we clamp the input number to be a max of 50
+			System.out.println("Max line size is 50.");
+			length = 50;
+		}
+		
+		/* Now for the actual drawing buttons
+			Each button will draw a given length line in a certain direction
+			Each of the methods called will be in the DisplayPanel.java file
+			Think of displaypanel.java as a helper class for the GUI
 		*/
+		if(e.getSource() == northButton){
+			direction = 1;
+			drawDisplay.draw_a_Line(flag, length, direction);
+		} else if(e.getSource() == southButton){
+			direction = 2;
+			drawDisplay.draw_a_Line(flag, length, direction);
+		} else if(e.getSource() == eastButton){
+			direction = 3;
+			drawDisplay.draw_a_Line(flag, length, direction);
+		} else if(e.getSource() == westButton){
+			direction = 4;
+			drawDisplay.draw_a_Line(flag, length, direction);
+		}
+		
+		if(flag == 1){
+			if(e.getSource() == lowerButton){
+				// Do nothing
+			} else {
+				System.out.print("Drawing line of size: " + length + ", ");
+				// Repaint is required as without it, the display will not update OR will only paint the most recent
+				// button press, if i recall correctly from when I was testing, the latter will occur.
+				drawDisplay.repaint();
+				totalGUI.repaint();
+			}
+		} else {
+			switch(direction){
+				case 1:
+					System.out.println("Moving line " + length + " steps North-ward");
+					break;
+				case 2:
+					System.out.println("Moving line " + length + " steps South-ward");
+					break;
+				case 3:
+					System.out.println("Moving line " + length + " steps East-ward");
+					break;
+				case 4:
+					System.out.println("Moving line " + length + " steps West-ward");
+					break;
+			}
+		}
 	}
 	
+	// This function is largely irrelevant in terms of server creation and connection as this just draws the whole GUI window.
 	private static void createWindow(){
 		JFrame.setDefaultLookAndFeelDecorated(true);
 		JFrame frame = new JFrame("CS460 Whiteboard GUI");
@@ -179,7 +273,7 @@ public class Whiteboard implements ActionListener{
 		frame.setContentPane(demo.createContentPane());
 		
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.setSize(520,600);
+		frame.setSize(520,680);
 		frame.setVisible(true);
 		// Refresh time
 		while(true){
@@ -193,6 +287,8 @@ public class Whiteboard implements ActionListener{
 	}
 	
 	public static void main(String[] args){
+		// This is where we would probably want to input the client connection information
+		
 		/*if(args.length != 2){
 			System.out.println("Error: Proper usage -> 'javaGUI [server] [port]");
 			System.exit(1);
