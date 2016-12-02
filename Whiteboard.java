@@ -1,8 +1,5 @@
-/*
-	CS460 - Turtle Graphics Client
-	Created by: Jesus Garcia, Chance Nelson
-
-*/
+// Turtle Graphics Client, for CS-460 Project 5
+// Authors: Jesus Garcia, Chance Nelson
 
 import java.awt.*;
 import java.awt.event.*;
@@ -13,6 +10,8 @@ import java.lang.Thread;
 import java.net.*;
 import java.io.*;
 
+
+// Whiteboard keeps track of client-server communication and initiating line draws
 public class Whiteboard implements ActionListener{
 	
 	// Init Globals
@@ -22,8 +21,7 @@ public class Whiteboard implements ActionListener{
 	Socket socket;
 	BufferedReader input;
 	PrintWriter output;
-	int currentX = 200;
-	int currentY = 200;
+	
 	int flag = 1;
 	int direction = 0;
 	
@@ -35,7 +33,6 @@ public class Whiteboard implements ActionListener{
 	JTextField textField = new JTextField(3);
 
 	// This is where the buttons and draw areas will be drawn
-	
 	public JPanel createContentPane(){
 		// Create a bottom JPanel to contain everything
 		totalGUI.setLayout(null);
@@ -182,7 +179,8 @@ public class Whiteboard implements ActionListener{
 
 		}
 
-
+        // send the packets corresponding to the line being drawn, and then draw the line
+        // locally just to make sure things dont break horribly
         send_packet(length, direction, drawDisplay.currentX, drawDisplay.currentY);           
         drawDisplay.draw_a_Line(flag, length, direction);
              
@@ -219,10 +217,17 @@ public class Whiteboard implements ActionListener{
 	}
 
     
+    
+    // desc: sends a series of packets to the server that represents the line being
+    //       drawn
+    // args: length - length of line
+    //       direction - flag for north, south, east, or west
+    //       x, y - x and y coordinates for the start of the line
     public void send_packet(int length, int direction, int x, int y) {
-
 		if(direction == 1){  // n
-			for(int i = 0; i < length; i++) {
+            // Loops through for the length of a line, and sends a packet for 
+            // each pixel to be changed			
+            for(int i = 0; i < length; i++) {
                 output.println(x + " " + y);
                 y++;
             
@@ -280,19 +285,21 @@ public class Whiteboard implements ActionListener{
 		}
 	}
 
-
+    // desc: retreives any packets the server has sent to the client, and adds
+    //       the coordinates from these packets to the draw queue in drawDisplay
     public void sync() {
-        System.out.println("syncing");        
+        System.out.println("syncing");                    // println for debug purposes        
         try {
-            String packet = input.readLine();
-            while(input.ready()) {
-                System.out.println(packet);
-                String[] temp = packet.split(" ");
+            
+            while(input.ready()) {                        // check if the server has more to send
+                String packet = input.readLine();         // grab the next packet       
+                System.out.println(packet);               // println or debug purposes
+                String[] temp = packet.split(" ");        // split the string, and send it to be drawn
                 drawDisplay.updateQueue(Integer.parseInt(temp[0]), Integer.parseInt(temp[1]), 0, 0);                
-                packet = input.readLine();
+                
 
             }
-
+          // catch any IOEcxeptions from wacky errors
         } catch (IOException e) {
             System.out.println("Done syncing");            
             return;
@@ -301,17 +308,22 @@ public class Whiteboard implements ActionListener{
 
     }
 
-
+    // desc: initialize a connection between the client and the server
+    // args: args - command line arguments from main()
     public void init_connection(String[] args) {
 		try{
+            // init the socket
             socket = new Socket(args[0], Integer.parseInt(args[1]));
-		    input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            
+            // create input and output streams to make my life easy		    
+            input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 		    output = new PrintWriter(socket.getOutputStream(), true);
         
+          // check for horrible errors
         } catch (Exception e) {
             e.printStackTrace();
             System.out.println("Connection init failed. Exiting");
-           // System.exit(1);
+            System.exit(1);
         
         }
 
