@@ -1,15 +1,7 @@
 /*
 	CS460 - Turtle Graphics Client
-	Created by: Jesus Garcia
-	
-	Task: 
-		" 	The application to be developed has two parts: a server, that represents a distributed "white board" and a client application, that sends commands to the server. The server interprets and executes the commands, which results in simple lines being drawn on the white board. At any time there may be several clients talking to the server and thus drawing on the white board.
-			The white board behaves like a turtle graphics application. This means that there is a single pen, which may be lifted (and thus does not draw) or put down (when it is supposed to draw). The pen can be moved in any one direction of north/south/east/west. When it is moved, it will do so in a pre-configured (but not hard-coded) increment in terms of length. This may or may not result in a line being drawn, depending on whether the pen is lifted (up) or not (down).
-			The client has a simple GUI with these input elements:
-			- Server address/port
-			- Buttons that represent the geographic directions N/S/E/W. If any one of these buttons is hit the pen is moved in that direction hit, at a length that is configurable.
-			- Buttons UP/DOWN for lifting the pen or putting it down
-			- Field to input the length of the distance to be moved upon hitting one of N/S/E/W "
+	Created by: Jesus Garcia, Chance Nelson
+
 */
 
 import java.awt.*;
@@ -27,10 +19,9 @@ public class Whiteboard implements ActionListener{
 	Date date = new Date();
 	Calendar calendar = Calendar.getInstance();
 	TextField result;
-    Socket socket;
-    BufferedReader input;
-    PrintWriter output;
-	public static String[] cmdInput;
+	Socket socket;
+	BufferedReader input;
+	PrintWriter output;
 	int currentX = 200;
 	int currentY = 200;
 	int flag = 1;
@@ -42,28 +33,14 @@ public class Whiteboard implements ActionListener{
 	JLabel dateLabel, northOutput, southOutput, eastOutput, westOutput, liftOutput, lowerOutput;
 	JButton northButton, southButton, eastButton, westButton, liftButton, lowerButton, resetButton;
 	JTextField textField = new JTextField(3);
-	/*
-	public void connect() throws IOException{
-		try {
-			socket = new Socket(cmdInput[0], Integer.parseInt(cmdInput[1]));
-			input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-			output = new PrintWriter(socket.getOutputStream(), true);
-			
-			System.out.println("Connected to Server.");
-		} catch (ConnectException e){
-			System.out.println("Error: Couldn't connect to server");
-			System.exit(1);
-		}
-	}
-	*/
-	
+
 	// This is where the buttons and draw areas will be drawn
 	
 	public JPanel createContentPane(){
 		// Create a bottom JPanel to contain everything
 		totalGUI.setLayout(null);
 		
-			// Create a panel to have titles
+		// Create a panel to have titles
 		titlePanel = new JPanel();
 		titlePanel.setLayout(null);
 		titlePanel.setLocation(10,0);
@@ -96,7 +73,7 @@ public class Whiteboard implements ActionListener{
 		textField.setHorizontalAlignment(0);
 		textPanel.add(textField);
 		
-			// Panel for the Buttons
+		// Panel for the Buttons
 		buttonPanel = new JPanel();
 		buttonPanel.setLayout(null);
 		buttonPanel.setLocation(10,30);
@@ -150,36 +127,13 @@ public class Whiteboard implements ActionListener{
         lowerButton.addActionListener(this);
         buttonPanel.add(lowerButton);
 
-		// Consider removing..
-        resetButton = new JButton("Clear board");
-        resetButton.setLocation(0, 70);
-        resetButton.setSize(480, 30);
-        resetButton.addActionListener(this);
-        buttonPanel.add(resetButton);
-		
 		totalGUI.setOpaque(true);
 		return totalGUI;
 	}
 	
 	// Create the actionPerformed method that catches ActionListeners
-	/* HERE IS WHERE THE BUTTON MAGIC HAPPENS
-		e.getSource() will check what button it was that called the function
-		'length' and 'text' are used for essentially the same thing, that being translating how far the user wants to draw
-		Under each if stated is where certain events will occur.
-		If flag == 0, the program will not draw anything
-			This is 1 otherwise and is only changed by either the Lower pen button and Lift pen buttons
-		Otherwise, the program will draw the desired size line in the direction of the button pressed
-	*/
 	public void actionPerformed(ActionEvent e){
-		calendar = Calendar.getInstance();/*
-		if(e.getSource() != resetButton){
-			try {
-				connect();
-			} catch(IOException exception) {
-				System.out.println("Error: Couldn't connect to server");
-				System.exit(1);
-			}
-		}*/
+		calendar = Calendar.getInstance();
 		int length = 0;
 		String text = textField.getText();
 		
@@ -190,12 +144,6 @@ public class Whiteboard implements ActionListener{
 		} else if(e.getSource() == lowerButton){
 			// Update a value to start drawing things again
 			flag = 1;
-		} else if(e.getSource() == resetButton){
-			// Consider removing, if kept then clear screen
-			// Ignore this button for now, don't really think we need a reset button
-			flag = 0;
-			direction = 0;
-			System.out.println("Clear board button Currently functions as a Lift Pen button");
 		}
 		
 		if(textField.getText() != ""){
@@ -222,17 +170,22 @@ public class Whiteboard implements ActionListener{
 		*/
 		if(e.getSource() == northButton){
 			direction = 1;
-			drawDisplay.draw_a_Line(flag, length, direction);
+
 		} else if(e.getSource() == southButton){
 			direction = 2;
-			drawDisplay.draw_a_Line(flag, length, direction);
+
 		} else if(e.getSource() == eastButton){
 			direction = 3;
-			drawDisplay.draw_a_Line(flag, length, direction);
+
 		} else if(e.getSource() == westButton){
 			direction = 4;
-			drawDisplay.draw_a_Line(flag, length, direction);
+
 		}
+
+
+        send_packet(length, direction, drawDisplay.currentX, drawDisplay.currentY);           
+        drawDisplay.draw_a_Line(flag, length, direction);
+             
 		
 		if(flag == 1){
 			if(e.getSource() == lowerButton){
@@ -261,15 +214,53 @@ public class Whiteboard implements ActionListener{
 			}
 		}
 	}
+
+    
+    public void send_packet(int length, int direction, int x, int y) {
+
+		if(direction == 1){  // n
+			for(int i = 0; i < length; i++) {
+                output.println(x + " " + y);
+                y++;
+            
+            }
+
+		} else if(direction == 2){  // s
+			for(int i = 0; i < length; i++) {
+                output.println(x + " " + y);
+                y--;
+            
+            }
+
+		} else if(direction == 3){  // e
+			for(int i = 0; i < length; i++) {
+                output.println(x + " " + y);
+                x++;
+            
+            }
+
+		} else if(direction == 4){  // w
+			for(int i = 0; i < length; i++) {
+                output.println(x + " " + y);
+                x--;
+            
+            }
+
+		}
+
+    }
+    
 	
 	// This function is largely irrelevant in terms of server creation and connection as this just draws the whole GUI window.
-	private static void createWindow(){
+	private static void createWindow(String[] args){
 		JFrame.setDefaultLookAndFeelDecorated(true);
 		JFrame frame = new JFrame("CS460 Whiteboard GUI");
 		
 		// Create the content panel
 		Whiteboard demo = new Whiteboard();
 		
+        demo.init_connection(args);
+
 		frame.setContentPane(demo.createContentPane());
 		
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -285,15 +276,50 @@ public class Whiteboard implements ActionListener{
 			demo.dateLabel.setText("Local Time: " + demo.date.toString());
 		}
 	}
+
+
+    public void sync() {
+        try {
+            String packet = input.readLine();
+            while(packet != null) {
+                String[] temp = packet.split(" ");
+                drawDisplay.updateQueue(Integer.parseInt(temp[0]), Integer.parseInt(temp[1]), 0, 0);
+                packet = input.readLine();
+
+            }
+
+        } catch (Exception e) {
+            return;
+        
+        }   
+
+    }
+
+
+    public void init_connection(String[] args) {
+		try{
+            socket = new Socket(args[0], Integer.parseInt(args[1]));
+		    input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+		    output = new PrintWriter(socket.getOutputStream(), true);
+        
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("Connection init failed. Exiting");
+           // System.exit(1);
+        
+        }
+
+    }
+
 	
 	public static void main(String[] args){
-		// This is where we would probably want to input the client connection information
-		
-		/*if(args.length != 2){
+		if(args.length != 2){
 			System.out.println("Error: Proper usage -> 'javaGUI [server] [port]");
 			System.exit(1);
-		}*/
-		// cmdInput = args;
-		createWindow();
+		
+		}
+
+        createWindow(args);
+
 	}
 }
