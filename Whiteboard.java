@@ -213,6 +213,9 @@ public class Whiteboard implements ActionListener{
 					break;
 			}
 		}
+
+        sync();
+
 	}
 
     
@@ -268,7 +271,7 @@ public class Whiteboard implements ActionListener{
 		frame.setVisible(true);
 		// Refresh time
 		while(true){
-			try{ Thread.sleep(1000); }
+			try{ Thread.sleep(100); }
 			catch(InterruptedException except){
 				Thread.currentThread().interrupt();
 			}
@@ -279,16 +282,19 @@ public class Whiteboard implements ActionListener{
 
 
     public void sync() {
+        System.out.println("syncing");        
         try {
             String packet = input.readLine();
-            while(packet != null) {
+            while(input.ready()) {
+                System.out.println(packet);
                 String[] temp = packet.split(" ");
-                drawDisplay.updateQueue(Integer.parseInt(temp[0]), Integer.parseInt(temp[1]), 0, 0);
+                drawDisplay.updateQueue(Integer.parseInt(temp[0]), Integer.parseInt(temp[1]), 0, 0);                
                 packet = input.readLine();
 
             }
 
-        } catch (Exception e) {
+        } catch (IOException e) {
+            System.out.println("Done syncing");            
             return;
         
         }   
