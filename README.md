@@ -1,7 +1,9 @@
 # CS460-Whiteboard-App
 
 Current Status:
+	
 	+ Fully functional!!
+	
 	- Except for a couple of drawing bugs..
 
 " 	The application to be developed has two parts: a server, that represents a distributed "white board" and a client application, that sends commands to the server.
