@@ -1,5 +1,7 @@
 # CS460-Whiteboard-App
 
+Link to youtube Video: https://www.youtube.com/watch?v=Z6XXEhwY3co&feature=youtu.be
+
 Current Status:
 	
 	+ Fully functional!!
