@@ -181,41 +181,41 @@ public class Whiteboard implements ActionListener{
 			direction = 4;
 
 		}
-
-
-        send_packet(length, direction, drawDisplay.currentX, drawDisplay.currentY);           
-        drawDisplay.draw_a_Line(flag, length, direction);
              
 		
 		if(flag == 1){
 			if(e.getSource() == lowerButton){
 				// Do nothing
 			} else {
+				send_packet(length, direction, drawDisplay.currentX, drawDisplay.currentY);           
+				drawDisplay.draw_a_Line(flag, length, direction);
 				System.out.print("Drawing line of size: " + length + ", ");
 				// Repaint is required as without it, the display will not update OR will only paint the most recent
 				// button press, if i recall correctly from when I was testing, the latter will occur.
 				drawDisplay.repaint();
 				totalGUI.repaint();
+				sync();
 			}
 		} else {
 			switch(direction){
 				case 1:
 					System.out.println("Moving line " + length + " steps North-ward");
+					drawDisplay.draw_a_Line(flag, length, direction);
 					break;
 				case 2:
 					System.out.println("Moving line " + length + " steps South-ward");
+					drawDisplay.draw_a_Line(flag, length, direction);
 					break;
 				case 3:
 					System.out.println("Moving line " + length + " steps East-ward");
+					drawDisplay.draw_a_Line(flag, length, direction);
 					break;
 				case 4:
 					System.out.println("Moving line " + length + " steps West-ward");
+					drawDisplay.draw_a_Line(flag, length, direction);
 					break;
 			}
 		}
-
-        sync();
-
 	}
 
     
@@ -320,7 +320,7 @@ public class Whiteboard implements ActionListener{
 	
 	public static void main(String[] args){
 		if(args.length != 2){
-			System.out.println("Error: Proper usage -> 'javaGUI [server] [port]");
+			System.out.println("Error: Proper usage -> 'jWhiteboard [server] [port]");
 			System.exit(1);
 		
 		}
