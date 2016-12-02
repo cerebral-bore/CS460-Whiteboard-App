@@ -35,6 +35,7 @@ public class ThreadHelper implements Runnable{
                 // check for discrepencies. If one is found, change the local copy and send a packet
                 if(localMapCopy[i][j] != map.get_map()[i][j]) {
                     out.println(i + " " + j);
+                    System.out.println(i + " " + j);
                     localMapCopy[i][j] = !localMapCopy[i][j];
                     
                 }
@@ -69,6 +70,7 @@ public class ThreadHelper implements Runnable{
                 // grab the x and y coordinates sent in the packet
                 int x = Integer.parseInt(input[0]);
                 int y = Integer.parseInt(input[1]);
+                System.out.println("received " + x + " " + y);
                 // flip this coordinate in the master copy
                 map.flip(x, y);
                 
