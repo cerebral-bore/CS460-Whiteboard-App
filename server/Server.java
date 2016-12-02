@@ -12,7 +12,16 @@ public class Server {
 
     
     public static void main(String[] args) throws Exception{
+        // check args
+        if(args.length == 0) {
+            System.out.println("Turtle Graphics Server\nCorrect Usage: Server size port");
+            System.exit(1);
+
+        }        
+
+        // init variables
         Map masterMap = new Map(Integer.parseInt(args[0]));            // set up a master copy of the map
+        if(args.length == 2) port = Integer.parseInt(args[1]);
 
         // Initialize the sockets
         Server.socket = new ServerSocket(port);
